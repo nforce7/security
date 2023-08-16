@@ -6,8 +6,7 @@ const app = express();
 const mongoose = require("mongoose");
 const encrypt = require("mongoose-encryption");  //for data encryption
 
-//start aadding mongoose encryption
-
+//start aadding mongoose encryption level3  : environment variables
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
