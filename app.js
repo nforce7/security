@@ -1,4 +1,5 @@
 //jshint esversion
+require('dotenv').config(); //npm install dotenv
 const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
@@ -19,9 +20,14 @@ const userSchema = new mongoose.Schema({
 })
 
 //add encryption. This line must be before the User model
-const secret ="thisisasecret";
+//using dotenv for environment variables, we can use .env file and write 
+//the secret key in .env file(delete the secret key from app.js) and not upload it on the server.
+ //when uploading the project to GitHub, we use .gitignore for .env
+
 //encrypt only the password
-userSchema.plugin(encrypt, { secret: secret, encryptedFields: ['password'] });
+
+//instead of using secret key from app.js which was in plain sight, we can use process.env.SECRET
+userSchema.plugin(encrypt, { secret: process.env.SECRET, encryptedFields: ['password'] });
 
 const User = new mongoose.model("User", userSchema);
 
