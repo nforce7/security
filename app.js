@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const app = express();
 const mongoose = require("mongoose");
+const encrypt = require("mongoose-encryption");  //for data encryption
 
 //start aadding mongoose encryption
 
@@ -11,12 +12,18 @@ app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
 
-//setup mongoose, userSchema and Model
+//setup mongoose, userSchema and Model 
 mongoose.connect("mongodb://127.0.0.1:27017/userDB", {useNewUrlParser: true, useunifiedTopology: true});
 const userSchema = new mongoose.Schema({
     email: String,
     password: String
 })
+
+//add encryption. This line must be before the User model
+const secret ="thisisasecret";
+//encrypt only the password
+userSchema.plugin(encrypt, { secret: secret, encryptedFields: ['password'] });
+
 const User = new mongoose.model("User", userSchema);
 
 
