@@ -25,12 +25,10 @@ const userSchema = new mongoose.Schema({
  //when uploading the project to GitHub, we use .gitignore for .env
 
 //encrypt only the password
-
 //instead of using secret key from app.js which was in plain sight, we can use process.env.SECRET
 userSchema.plugin(encrypt, { secret: process.env.SECRET, encryptedFields: ['password'] });
 
 const User = new mongoose.model("User", userSchema);
-
 
 app.get("/", function(req, res) {
     res.render("home");
@@ -44,14 +42,9 @@ app.get("/register", function(req, res) {
     res.render("register");
 })
 
-
-
 app.get("/compose", function(req, res) {
     res.render("compose");
 })
-
-
-
 
 app.listen(3000, function() {
     console.log("Server started on port 3000");
