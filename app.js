@@ -7,7 +7,7 @@ const app = express();
 const mongoose = require("mongoose");
 const md5 = require("md5"); //we added md5 (hashing) for data encryption
 
-//start adding mongoose encryption level4a  : hashing and salting
+//start adding mongoose encryption level4a: hashing and salting
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
