@@ -5,9 +5,9 @@ const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const app = express();
 const mongoose = require("mongoose");
-const encrypt = require("mongoose-encryption");  //for data encryption
+const md5 = require("md5"); //we added md5 (hashing) for data encryption
 
-//start aadding mongoose encryption level4  : hashing,salting
+//start adding mongoose encryption level4  : hashing with md5 function
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
@@ -18,15 +18,6 @@ const userSchema = new mongoose.Schema({
     email: String,
     password: String
 })
-
-//add encryption. This line must be before the User model
-//using dotenv for environment variables, we can use .env file and write 
-//the secret key in .env file(delete the secret key from app.js) and not upload it on the server.
- //when uploading the project to GitHub, we use .gitignore for .env
-
-//encrypt only the password
-//instead of using secret key from app.js which was in plain sight, we can use process.env.SECRET
-userSchema.plugin(encrypt, { secret: process.env.SECRET, encryptedFields: ['password'] });
 
 const User = new mongoose.model("User", userSchema);
 
@@ -57,7 +48,7 @@ app.listen(3000, function() {
 app.post("/register", async function(req, res) {
     const newUser = new User({
         email: req.body.username,
-        password: req.body.password
+        password: md5(req.body.password)  //we used md5 to encrypt the password
     });
 
     //save the user
@@ -72,7 +63,7 @@ app.post("/register", async function(req, res) {
 
 app.post("/login", async function(req, res) {
     const username = req.body.username;
-    const password = req.body.password;
+    const password = md5(req.body.password);  //we have to use md5 here also (to compare with the password from the register route)
     try{
         const foundUser = await User.findOne({email: username});
         if(foundUser){
