@@ -5,10 +5,10 @@ const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const app = express();
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt"); //we added bcrypt (hashing) for data encryption
-const saltRounds = 10;  //we added saltRounds for data encryption
+const bcrypt = require("bcrypt"); 
+const saltRounds = 10;  
 
-//start adding mongoose encryption level4a: hashing and salting (using bcrypt)
+//start adding mongoose encryption level5 : passport using cookies and sessions
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
