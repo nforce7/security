@@ -9,7 +9,7 @@ const session = require("express-session"); //the first step is to require expre
 const passport = require("passport"); //the second step is to require passport
 const passportLocalMongoose = require("passport-local-mongoose"); //the third step is to require passport-local-mongoose
 
-//start adding mongoose encryption level5 : passport using cookies and sessions.
+//start adding mongoose encryption level6 : google Oauth 2.0
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
