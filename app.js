@@ -8,6 +8,8 @@ const mongoose = require("mongoose");
 const session = require("express-session"); //the first step is to require express-session
 const passport = require("passport"); //the second step is to require passport
 const passportLocalMongoose = require("passport-local-mongoose"); //the third step is to require passport-local-mongoose
+const GoogleStrategy= require('passport-google-oauth20').Strategy;
+const findOrCreate = require("mongoose-findorcreate")
 
 //start adding mongoose encryption level6 : google Oauth 2.0
 app.set("view engine", "ejs");
@@ -29,25 +31,65 @@ app.use(passport.session());
 mongoose.connect("mongodb://127.0.0.1:27017/userDB", {useNewUrlParser: true, useunifiedTopology: true});
 const userSchema = new mongoose.Schema({
     email: String,
-    password: String
+    password: String,
+    googleId: String
 })
 
 //the fifth step is to set up passport-local-mongoose
 //we have to add it to our mongoose schema (userSchema) as a plugin
 //we use this to salt and hash our passwords and save users to our database
 userSchema.plugin(passportLocalMongoose);
+//We configure findorcreate (from npm package mongoose-findorcreate)
+userSchema.plugin(findOrCreate);
 
 const User = new mongoose.model("User", userSchema);
 
 //the next step is to initialize passport. This code must go after the mongoose model
-passport.use(User.createStrategy());
-//serialize and deserialize is only needed for sessions
-passport.serializeUser(User.serializeUser());  //to store the user in the session
-passport.deserializeUser(User.deserializeUser()); //to retrieve the user from the session
+// Serialize and deserialize is only needed for sessions using passport
+passport.serializeUser(function (user, done) {
+    done(null, user.id);
+});
+
+passport.deserializeUser(function (id, done) {
+    User.findById(id)
+        .then((user) => {
+            done(null, user);
+        })
+        .catch((err) => {
+            done(err, null);
+        });
+});
+
+//Code from passport documentation for google OAuth
+//Here we set up options for Google strategy
+passport.use(new GoogleStrategy({
+    clientID: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET,
+    callbackURL: "http://localhost:3000/auth/google/secrets",
+    userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
+  },
+  function(accessToken, refreshToken, profile, cb) {
+    console.log(profile);
+    User.findOrCreate({ googleId: profile.id }, function (err, user) {
+      return cb(err, user);
+    });
+  }
+));
+
 
 app.get("/", function(req, res) {
     res.render("home");
 })
+
+//we configure google authentication when the user clicks the "sign in with google" button
+app.get("/auth/google", passport.authenticate("google", { scope: ["profile"] }));
+
+//here google redirects the user to the /auth/google/secrets on our local server for local authentication
+app.get("/auth/google/secrets", passport.authenticate("google", { failureRedirect: "/login" }), function(req, res) {
+    // Successful authentication, redirect home.
+    res.redirect("/secrets");
+})
+
 
 app.get("/login", function(req, res) {
     res.render("login");
