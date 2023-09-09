@@ -11,7 +11,7 @@ const passportLocalMongoose = require("passport-local-mongoose"); //the third st
 const GoogleStrategy= require('passport-google-oauth20').Strategy;
 const findOrCreate = require("mongoose-findorcreate")
 
-//start adding mongoose encryption level6 : google Oauth 2.0
+//Finishing up the app :Letting users submit secrets
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
